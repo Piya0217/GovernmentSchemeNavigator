@@ -183,11 +183,19 @@ def handle_answer(args: argparse.Namespace) -> int:
             logger.info(
                 "       Page     : %d  |  Chunk: %d", p.page_number, p.chunk_index
             )
-            logger.info(
-                "       Distance : %.4f  |  Score: %.4f",
-                p.distance,
-                p.similarity_score,
-            )
+            if p.rerank_score is not None:
+                logger.info(
+                    "       Distance : %.4f  |  Score: %.4f  |  Rerank: %.4f",
+                    p.distance,
+                    p.similarity_score,
+                    p.rerank_score,
+                )
+            else:
+                logger.info(
+                    "       Distance : %.4f  |  Score: %.4f",
+                    p.distance,
+                    p.similarity_score,
+                )
             logger.info("       Source   : %s", p.official_source_url)
             if p.document_version:
                 logger.info("       Version  : %s", p.document_version)

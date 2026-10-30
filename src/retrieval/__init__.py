@@ -19,6 +19,12 @@ from src.retrieval.query_analyzer import (
     expand_query_intent,
     has_kannada_script,
 )
+from src.retrieval.reranker import (
+    QuestionIntent,
+    detect_question_intent,
+    rerank_passages,
+    score_passage,
+)
 from src.retrieval.schemas import (
     DocumentIndexRecord,
     IndexedChunk,
@@ -43,6 +49,7 @@ __all__ = [
     "IndexedChunk",
     "IndexedChunkMetadata",
     "IndexerError",
+    "QuestionIntent",
     "SCHEME_ALIASES",
     "SchemeIndexer",
     "SchemeSearcher",
@@ -53,8 +60,11 @@ __all__ = [
     "VectorStoreError",
     "assess_evidence",
     "detect_explicit_scheme",
+    "detect_question_intent",
     "expand_query_intent",
     "has_kannada_script",
     "has_welfare_context",
     "is_out_of_scope",
+    "rerank_passages",
+    "score_passage",
 ]

@@ -76,6 +76,15 @@ class EvidencePassage(BaseModel):
     similarity_score: float = Field(
         ..., ge=0.0, le=1.0, description="Normalized similarity score in [0.0, 1.0]."
     )
+    rerank_score: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description=(
+            "Deterministic question-passage rerank score in [0.0, 1.0]. "
+            "Separated from raw vector distance to preserve auditability."
+        ),
+    )
 
 
 class AnswerResponse(BaseModel):
@@ -253,8 +262,11 @@ class AnswerBuilder:
                 detected_scheme_id=detected,
             )
 
-        # Step 3: Build passages (top MAX_PASSAGES_PER_ANSWER)
-        top_accepted = accepted[:MAX_PASSAGES_PER_ANSWER]
+        # Step 3: Deterministic passage reranking for answer focus
+        from src.retrieval.reranker import rerank_passages
+
+        reranked = rerank_passages(query, accepted)
+        top_accepted = reranked[:MAX_PASSAGES_PER_ANSWER]
         passages = [_build_passage(r) for r in top_accepted]
 
         return AnswerResponse(
@@ -294,4 +306,5 @@ def _build_passage(result: SearchResult) -> EvidencePassage:
         passage_text=passage_text,
         distance=result.distance,
         similarity_score=result.similarity_score,
+        rerank_score=result.rerank_score,
     )

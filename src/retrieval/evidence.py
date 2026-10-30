@@ -68,8 +68,10 @@ _OOS_PATTERNS_LATIN: list[re.Pattern[str]] = [
 
 # Kannada OOS patterns (substring, no word-boundary needed for Indic)
 _OOS_PATTERNS_KANNADA: list[str] = [
-    "ಚಾಲನಾ ಪರವಾನಗಿ",  # driving license
+    "ಚಾಲನಾ ಪರವಾನಗಿ",  # driving license (formal Kannada)
     "ವಾಹನ ಚಾಲನಾ ಪರವಾನಿಗೆ",  # vehicle driving license variant
+    "ಡ್ರೈವಿಂಗ್ ಲೈಸೆನ್ಸ್",  # driving license (common transliteration)
+    "ಲೈಸೆನ್ಸ್",  # license
     "ಇಸ್ರೋ",  # ISRO in Kannada
     "ಪಾಸ್‌ಪೋರ್ಟ್",  # passport
 ]
