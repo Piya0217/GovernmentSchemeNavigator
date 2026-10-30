@@ -6,6 +6,12 @@ from src.retrieval.embedder import (
     SentenceTransformerEmbedder,
 )
 from src.retrieval.indexer import IndexerError, SchemeIndexer
+from src.retrieval.query_analyzer import (
+    SCHEME_ALIASES,
+    detect_explicit_scheme,
+    expand_query_intent,
+    has_kannada_script,
+)
 from src.retrieval.schemas import (
     DocumentIndexRecord,
     IndexedChunk,
@@ -26,6 +32,7 @@ __all__ = [
     "IndexedChunk",
     "IndexedChunkMetadata",
     "IndexerError",
+    "SCHEME_ALIASES",
     "SchemeIndexer",
     "SchemeSearcher",
     "SearchError",
@@ -33,4 +40,7 @@ __all__ = [
     "SearchResult",
     "SentenceTransformerEmbedder",
     "VectorStoreError",
+    "detect_explicit_scheme",
+    "expand_query_intent",
+    "has_kannada_script",
 ]
