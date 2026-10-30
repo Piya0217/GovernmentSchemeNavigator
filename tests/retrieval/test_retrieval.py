@@ -325,11 +325,13 @@ def test_searcher_retrieval_and_provenance(tmp_path: Path) -> None:
     assert 0.0 <= top.similarity_score <= 1.0
 
     # 2. Scheme-filtered query: requesting central_pmjay must NOT
-    # return central_pm_kisan chunks
+    # return central_pm_kisan chunks.
+    # Use max_distance=None to avoid fake-embedder hash distances exceeding threshold.
     pmjay_results = searcher.search(
         "financial benefits",
         top_k=5,
         scheme_id="central_pmjay",
+        max_distance=None,
     )
     assert len(pmjay_results) > 0
     assert all(r.scheme_id == "central_pmjay" for r in pmjay_results)

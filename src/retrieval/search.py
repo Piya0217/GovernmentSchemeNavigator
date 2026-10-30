@@ -6,12 +6,13 @@ import logging
 from typing import Any
 
 from src.retrieval.embedder import BaseEmbedder
+from src.retrieval.query_analyzer import detect_explicit_scheme, expand_query_intent
 from src.retrieval.schemas import SearchQuery, SearchResult
 from src.retrieval.store import ChromaVectorStore
 
 logger = logging.getLogger("scheme_navigator.retrieval.search")
 
-DEFAULT_SIMILARITY_THRESHOLD_DISTANCE = 1.3  # Cosine distance cutoff for relevance
+DEFAULT_SIMILARITY_THRESHOLD_DISTANCE = 0.60  # Cosine distance cutoff for relevance
 
 
 class SearchError(Exception):
@@ -70,18 +71,31 @@ class SchemeSearcher:
         if not search_query.query:
             return []
 
-        # Embed query text
+        # 1. Scheme-Aware Routing: Auto-detect explicit scheme alias if not provided
+        effective_scheme_id = search_query.scheme_id
+        if not effective_scheme_id:
+            effective_scheme_id = detect_explicit_scheme(search_query.query)
+            if effective_scheme_id:
+                logger.info(
+                    "Auto-routed query to recognized scheme: '%s'",
+                    effective_scheme_id,
+                )
+
+        # 2. Cross-lingual intent expansion for regional language queries
+        search_text = expand_query_intent(search_query.query)
+
+        # 3. Embed query text
         try:
-            query_vector = self.embedder.embed_query(search_query.query)
+            query_vector = self.embedder.embed_query(search_text)
         except Exception as err:
             msg = f"Failed to embed query: {err}"
             raise SearchError(msg) from err
 
         where_filter: dict[str, Any] | None = None
-        if search_query.scheme_id:
-            where_filter = {"scheme_id": search_query.scheme_id}
+        if effective_scheme_id:
+            where_filter = {"scheme_id": effective_scheme_id}
 
-        # Query vector store
+        # 4. Query vector store
         try:
             raw_results = self.store.query(
                 collection_name=self.collection_name,
