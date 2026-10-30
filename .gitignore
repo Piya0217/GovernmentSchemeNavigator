@@ -28,6 +28,7 @@ ENV/
 # Secrets & environment files
 # ---------------------------------------------------------------------------
 .env
+.env.*
 *.env
 !.env.example
 secrets/
