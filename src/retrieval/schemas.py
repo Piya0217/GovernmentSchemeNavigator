@@ -90,6 +90,15 @@ class SearchResult(BaseModel):
         le=1.0,
         description="Normalized similarity metric in range [0.0, 1.0].",
     )
+    rerank_score: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description=(
+            "Optional deterministic question-passage reranking score in [0.0, 1.0]. "
+            "Separated from raw vector distance to preserve auditability."
+        ),
+    )
 
 
 class DocumentIndexRecord(BaseModel):
