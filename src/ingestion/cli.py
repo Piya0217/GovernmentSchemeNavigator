@@ -72,6 +72,16 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Replace an existing output JSON with the same scheme ID.",
     )
+    parser.add_argument(
+        "--page-filter",
+        default=None,
+        type=str,
+        help=(
+            "Comma-separated 1-indexed page numbers to include, e.g. '2,3,4'. "
+            "When omitted all pages are processed. "
+            "total_pages in the output always reflects the full PDF page count."
+        ),
+    )
     return parser
 
 
@@ -99,6 +109,20 @@ def main(argv: list[str] | None = None) -> int:
             chunk_size=args.chunk_size,
             chunk_overlap=args.chunk_overlap,
         )
+
+        page_filter: frozenset[int] | None = None
+        if args.page_filter is not None:
+            try:
+                page_filter = frozenset(
+                    int(p.strip()) for p in args.page_filter.split(",") if p.strip()
+                )
+            except ValueError:
+                logger.error(
+                    "--page-filter must be comma-separated integers, got: %s",
+                    args.page_filter,
+                )
+                return 1
+
         logger.info("Starting ingestion for scheme: %s", metadata.scheme_id)
         doc = run_ingestion_pipeline(
             pdf_path=pdf_file,
@@ -106,6 +130,7 @@ def main(argv: list[str] | None = None) -> int:
             chunk_config=chunk_config,
             output_dir=args.output_dir,
             overwrite=args.overwrite,
+            page_filter=page_filter,
         )
         logger.info(
             "Successfully ingested %s: %d pages, %d chunks saved to %s/%s.json",

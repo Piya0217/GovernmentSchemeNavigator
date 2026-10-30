@@ -89,7 +89,12 @@ def chunk_document_pages(
     """Split a list of page text data into structured SchemeChunks.
 
     Args:
-        pages: List of extracted page data.
+        pages: List of extracted page data.  Each page's ``cleaned_text``
+            field is used exclusively; ``raw_text`` is never fed to the
+            chunker.  Pages whose ``cleaned_text`` is empty (e.g. image-only
+            pages whose raw bytes were entirely control characters) produce
+            no chunks — they are silently skipped rather than falling back
+            to unfiltered bytes.
         metadata: Metadata describing the document and scheme.
         config: Optional ChunkingConfig; defaults to standard 500/100 config.
 
@@ -102,7 +107,7 @@ def chunk_document_pages(
     now = datetime.now(UTC)
 
     for page in pages:
-        text_to_chunk = page.cleaned_text or page.raw_text
+        text_to_chunk = page.cleaned_text
         page_chunks = split_text_into_chunks(text_to_chunk, cfg)
 
         for text in page_chunks:
