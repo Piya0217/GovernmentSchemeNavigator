@@ -177,3 +177,82 @@ def test_pipeline_corrupted_pdf_raises(tmp_path: Path) -> None:
             metadata=metadata,
             output_dir=tmp_path / "processed",
         )
+
+
+# ---------------------------------------------------------------------------
+# Page filter tests
+# ---------------------------------------------------------------------------
+
+
+def test_pipeline_page_filter_limits_chunks(
+    make_pdf: Callable[..., Path], tmp_path: Path
+) -> None:
+    """page_filter restricts which pages contribute chunks.
+
+    total_pages always reflects the full PDF count.
+    """
+    pages = [
+        "Page one content about eligibility.",
+        "Page two content about benefits.",
+        "Page three content about documents required.",
+    ]
+    pdf_path = make_pdf(pages, "three_page.pdf")
+    metadata = DocumentMetadata(
+        scheme_id="filter-test",
+        source_document=pdf_path.name,
+        official_source_url="https://example.gov.in/scheme.pdf",
+    )
+
+    result_all = run_ingestion_pipeline(
+        pdf_path=pdf_path,
+        metadata=metadata,
+        output_dir=tmp_path / "processed_all",
+    )
+
+    result_filtered = run_ingestion_pipeline(
+        pdf_path=pdf_path,
+        metadata=metadata,
+        output_dir=tmp_path / "processed_filtered",
+        page_filter={1, 3},
+    )
+
+    # total_pages always reflects the full PDF
+    assert result_all.total_pages == 3
+    assert result_filtered.total_pages == 3
+
+    # Filtered run produces fewer chunks than unfiltered
+    assert result_filtered.total_chunks < result_all.total_chunks
+
+    # Only pages 1 and 3 appear in filtered output
+    chunk_pages = {c.page_number for c in result_filtered.chunks}
+    assert chunk_pages <= {1, 3}
+    assert 2 not in chunk_pages
+
+
+def test_pipeline_page_filter_preserves_original_page_numbers(
+    make_pdf: Callable[..., Path], tmp_path: Path
+) -> None:
+    """Page numbers in filtered output reference original PDF pages (not renumbered)."""
+    pages = [
+        "First page: introduction and scope.",
+        "Second page: excluded from this ingestion.",
+        "Third page: the actual rules and eligibility.",
+    ]
+    pdf_path = make_pdf(pages, "numbered.pdf")
+    metadata = DocumentMetadata(
+        scheme_id="page-num-test",
+        source_document=pdf_path.name,
+        official_source_url="https://example.gov.in/doc.pdf",
+    )
+
+    result = run_ingestion_pipeline(
+        pdf_path=pdf_path,
+        metadata=metadata,
+        output_dir=tmp_path / "processed",
+        page_filter={3},
+    )
+
+    # All chunks should reference page 3 (not page 1 after renumbering)
+    assert result.total_chunks > 0
+    for chunk in result.chunks:
+        assert chunk.page_number == 3

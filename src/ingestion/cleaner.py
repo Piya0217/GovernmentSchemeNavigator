@@ -3,8 +3,15 @@
 import re
 import unicodedata
 
-# Form feed, null byte, BOM, and non-printable control characters
-_CONTROL_CHARS_PATTERN = re.compile(r"[\x00\x07\x08\x0b\x0c\x0e-\x1f\ufeff]")
+# Non-printable control characters to strip:
+#   \x00-\x08  – null, SOH-BS (includes PDF font-ligature artefacts \x01-\x06)
+#   \x0b-\x0c  – vertical tab, form feed
+#   \x0e-\x1f  – SO through US (shift-out, data-link, etc.)
+#   \x7f-\x9f  – DEL + C1 control block (undefined in Unicode, leaked from
+#                  subsetted PDF fonts such as PM Vishwakarma guidelines)
+#   \ufeff     – BOM / zero-width no-break space
+# Deliberately preserved: \x09 (TAB), \x0a (LF), \x0d (CR) — meaningful whitespace.
+_CONTROL_CHARS_PATTERN = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f\ufeff]")
 _TABLE_TAB_PATTERN = re.compile(r"(?<=\S)\t+(?=\S)")
 _TABLE_COLUMN_GAP_PATTERN = re.compile(r" {2,}")
 _HORIZONTAL_WHITESPACE_PATTERN = re.compile(r"[^\S\n]+")
@@ -13,13 +20,23 @@ _HYPHENATED_WORD_PATTERN = re.compile(r"(\b[a-zA-Z]+)-\n([a-zA-Z]+\b)")
 
 
 def _clean_control_characters(text: str) -> str:
-    """Remove control characters and encoding artifacts while preserving Indic text.
+    """Remove control characters and encoding artefacts while preserving Indic text.
+
+    Strips C0 bytes (0x00-0x08, 0x0B-0x0C, 0x0E-0x1F), which includes the
+    PDF font-ligature placeholder bytes 0x01-0x06 emitted by some government
+    PDFs (e.g. PM Vishwakarma), the full C1 block (0x7F-0x9F) that leaks from
+    subsetted fonts with Windows-1252 glyph mappings, and the Unicode BOM
+    (U+FEFF). TAB (0x09), LF (0x0A), and CR (0x0D) are preserved as
+    meaningful whitespace.
+
+    Valid Unicode — including Devanagari, Kannada, and other Indic scripts —
+    is never affected.
 
     Args:
         text: Input string.
 
     Returns:
-        String with control artifacts removed.
+        String with control artefacts removed.
     """
     normalized = unicodedata.normalize("NFC", text)
     return _CONTROL_CHARS_PATTERN.sub("", normalized)

@@ -1,6 +1,7 @@
 """Ingestion pipeline coordinating loading, cleaning, chunking, and JSON output."""
 
 import json
+from collections.abc import Set as AbstractSet
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -38,6 +39,27 @@ def _clean_pages(raw_pages: list[PageData]) -> list[PageData]:
     return cleaned_pages
 
 
+def _filter_pages(
+    pages: list[PageData], page_filter: AbstractSet[int] | None
+) -> list[PageData]:
+    """Return only the pages whose page_number is in *page_filter*.
+
+    If *page_filter* is ``None`` all pages are returned unchanged.
+
+    Args:
+        pages: All pages extracted from the PDF.
+        page_filter: Set of 1-indexed page numbers to keep, or ``None`` to
+            keep all pages.
+
+    Returns:
+        Filtered list preserving the original order and the original 1-based
+        page numbers so that chunk provenance remains accurate.
+    """
+    if page_filter is None:
+        return pages
+    return [p for p in pages if p.page_number in page_filter]
+
+
 def _save_processed_document(
     doc: ProcessedDocument, output_dir: Path, overwrite: bool = False
 ) -> Path:
@@ -70,6 +92,7 @@ def run_ingestion_pipeline(
     chunk_config: ChunkingConfig | None = None,
     output_dir: Path | str = "data/processed",
     overwrite: bool = False,
+    page_filter: AbstractSet[int] | None = None,
 ) -> ProcessedDocument:
     """Execute the end-to-end ingestion pipeline for a single PDF.
 
@@ -79,13 +102,19 @@ def run_ingestion_pipeline(
         chunk_config: Optional chunking parameters (size and overlap).
         output_dir: Directory where processed JSON is written.
         overwrite: Whether to replace an existing processed JSON artifact.
+        page_filter: Optional set of 1-indexed page numbers to include.  When
+            provided, only those pages are cleaned and chunked; all other pages
+            are silently skipped.  The ``total_pages`` field in the output
+            reflects the **full** PDF page count so that provenance remains
+            accurate.  Pass ``None`` (default) to process every page.
 
     Returns:
         ProcessedDocument containing all metadata and chunks.
     """
     path = Path(pdf_path).resolve()
     raw_pages = load_pdf_pages(path)
-    cleaned_pages = _clean_pages(raw_pages)
+    pages_to_process = _filter_pages(raw_pages, page_filter)
+    cleaned_pages = _clean_pages(pages_to_process)
     chunks = chunk_document_pages(cleaned_pages, metadata, chunk_config)
 
     processed_doc = ProcessedDocument(
