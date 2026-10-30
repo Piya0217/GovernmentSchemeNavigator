@@ -1,0 +1,187 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "description": "Authoritative registry of Indian government welfare scheme documents for Government Scheme Navigator.",
+  "last_updated": "2026-10-30",
+  "schemes": [
+    {
+      "scheme_id": "central_pm_kisan",
+      "scheme_name": "PM-KISAN (Pradhan Mantri Kisan Samman Nidhi)",
+      "jurisdiction": "central",
+      "issuing_authority": "Department of Agriculture, Cooperation & Farmers Welfare, Ministry of Agriculture & Farmers Welfare, Government of India",
+      "official_source_url": "https://pmkisan.gov.in/Documents/RevisedPM-KISANOperationalGuidelines(English).pdf",
+      "portal_url": "https://pmkisan.gov.in/",
+      "document_title": "PRADHAN MANTRI KISAN SAMMAN NIDHI SCHEME (PM-KISAN SCHEME) OPERATIONAL GUIDELINES (REVISED AS ON 29.03.2020)",
+      "publication_or_effective_date": "2020-03-29",
+      "local_filename": "central_pm_kisan_guidelines_2020.pdf",
+      "verification_status": "verified_digital_text",
+      "document_metadata": {
+        "page_count": 12,
+        "extractable_characters": 28191,
+        "file_size_bytes": 824649,
+        "format": "PDF 1.4",
+        "has_digital_text": true
+      },
+      "warnings": [],
+      "notes": "Fully verified digital PDF. Contains complete operational guidelines, eligibility criteria (small/marginal farmer families), exclusion categories (institutional landholders, constitutional posts, retired pensioners >10k, taxpayers), and fund transfer modalities."
+    },
+    {
+      "scheme_id": "central_pmjay",
+      "scheme_name": "Ayushman Bharat PM-JAY (Pradhan Mantri Jan Arogya Yojana)",
+      "jurisdiction": "central",
+      "issuing_authority": "National Health Authority (NHA), Ministry of Health and Family Welfare, Government of India",
+      "official_source_url": "https://hem.nha.gov.in/BeneficiaryIdentification.pdf",
+      "portal_url": "https://nha.gov.in/PM-JAY",
+      "document_title": "Beneficiary Identification Guidelines - AYUSHMAN BHARAT – PRADHAN MANTRI JAN AROGYA YOJANA (AB PM-JAY)",
+      "publication_or_effective_date": "2018-09-23",
+      "local_filename": "central_pmjay_beneficiary_guidelines.pdf",
+      "verification_status": "verified_digital_text",
+      "document_metadata": {
+        "page_count": 16,
+        "extractable_characters": 27742,
+        "file_size_bytes": 3560550,
+        "format": "PDF 1.4",
+        "has_digital_text": true
+      },
+      "warnings": [],
+      "notes": "Official beneficiary identification guidelines published by the National Health Authority. Detailed rules for SECC 2011 deprivation criteria, rural (D1-D7) and urban (occupational categories 1-11) eligibility, golden card issuance, and verification workflows."
+    },
+    {
+      "scheme_id": "central_pm_vishwakarma",
+      "scheme_name": "PM Vishwakarma Scheme",
+      "jurisdiction": "central",
+      "issuing_authority": "Ministry of Micro, Small and Medium Enterprises (MSME), Government of India",
+      "official_source_url": "https://pmvishwakarma.gov.in/cdn/MiscFiles/eng_v30.0_PM_Vishwakarma_Guidelines_final.pdf",
+      "portal_url": "https://pmvishwakarma.gov.in/",
+      "document_title": "Scheme Guidelines for PM Vishwakarma",
+      "publication_or_effective_date": "2023-09-17",
+      "local_filename": "central_pm_vishwakarma_guidelines_2023.pdf",
+      "verification_status": "verified_digital_text",
+      "document_metadata": {
+        "page_count": 64,
+        "extractable_characters": 76009,
+        "file_size_bytes": 11140167,
+        "format": "PDF 1.7",
+        "has_digital_text": true
+      },
+      "warnings": [],
+      "notes": "Comprehensive official scheme guidelines covering all 18 traditional trade families (carpenters, blacksmiths, goldsmiths, potters, etc.), three-stage verification process (Gram Panchayat/ULB, District, Screening Committee), skill upgrading, toolkit incentive (Rs. 15,000), collateral-free enterprise credit (Tranche 1 Rs. 1 lakh @ 5%, Tranche 2 Rs. 2 lakh), and digital incentive."
+    },
+    {
+      "scheme_id": "central_sukanya_samriddhi",
+      "scheme_name": "Sukanya Samriddhi Account Scheme (SSY)",
+      "jurisdiction": "central",
+      "issuing_authority": "Department of Economic Affairs, Ministry of Finance / Department of Posts, Government of India",
+      "official_source_url": "https://www.indiapost.gov.in/documents/offerings/schemesandservices/posb/SukanyaSamriddhiAccountScheme2019English.pdf",
+      "portal_url": "https://www.indiapost.gov.in/",
+      "document_title": "Sukanya Samriddhi Account Scheme, 2019 (Gazette Notification G.S.R. 914(E))",
+      "publication_or_effective_date": "2019-12-12",
+      "local_filename": "central_sukanya_samriddhi_rules_2019.pdf",
+      "verification_status": "verified_digital_text",
+      "document_metadata": {
+        "page_count": 9,
+        "extractable_characters": 23402,
+        "file_size_bytes": 249542,
+        "format": "PDF 1.4",
+        "has_digital_text": true
+      },
+      "warnings": [
+        "Document is bilingual (Hindi on left pages, English on right pages); chunking should distinguish languages or target the English gazette text sections (pages 5–9)."
+      ],
+      "notes": "Statutory Gazette Notification G.S.R. 914(E) under Government Savings Promotion Act, 1873. Specifies age limit (girl child below 10 years), maximum 2 accounts per family (with exception for twins/triplets), deposit limits (min Rs. 250, max Rs. 1.5 lakh per fiscal year), tenure (21 years), premature closure, and withdrawal rules (up to 50% after age 18 for higher education)."
+    },
+    {
+      "scheme_id": "central_pm_ujjwala",
+      "scheme_name": "Pradhan Mantri Ujjwala Yojana (PMUY)",
+      "jurisdiction": "central",
+      "issuing_authority": "Ministry of Petroleum and Natural Gas (MoPNG), Government of India",
+      "official_source_url": "https://mopng.gov.in/files/marketing/lpg/P_17018_1_2016_Ujjwala_KYC.pdf",
+      "portal_url": "https://www.pmuy.gov.in/",
+      "document_title": "Pradhan Mantri Ujjwala Yojana (PMUY) Guidelines and KYC Modalities",
+      "publication_or_effective_date": "2016-05-01",
+      "local_filename": "central_pm_ujjwala_kyc_guidelines_2016.pdf",
+      "verification_status": "verified_scanned_image",
+      "document_metadata": {
+        "page_count": 4,
+        "extractable_characters": 0,
+        "file_size_bytes": 1955740,
+        "format": "PDF 1.5",
+        "has_digital_text": false
+      },
+      "warnings": [
+        "SCANNED_IMAGE_ONLY: 0 extractable text characters via standard PDF parsers. Requires OCR ingestion pipeline (e.g. Tesseract/EasyOCR) or supplementary digital notification before chunking."
+      ],
+      "notes": "Official ministry document containing PMUY KYC form, 14-point declaration, and target priority categories (SECC list, SC/ST, PMAY, AAY, Most Backward Classes, forest dwellers, island/river islands). Digital pipeline requires OCR handling."
+    },
+    {
+      "scheme_id": "karnataka_gruha_lakshmi",
+      "scheme_name": "Gruha Lakshmi Scheme",
+      "jurisdiction": "state",
+      "issuing_authority": "Department of Women and Child Development, Government of Karnataka",
+      "official_source_url": "https://kla.kar.nic.in/council/Replies/unstarred/19072024/usq438(19072024).pdf",
+      "portal_url": "https://sevasindhuservices.karnataka.gov.in/",
+      "document_title": "Karnataka Legislative Council Unstarred Question No. 438 Reply - Gruha Lakshmi Scheme Guidelines & Orders (GO No. WCD 70 WDC 2023)",
+      "publication_or_effective_date": "2024-07-19",
+      "local_filename": "karnataka_gruha_lakshmi_council_order_2024.pdf",
+      "verification_status": "verified_legacy_font_mapped",
+      "document_metadata": {
+        "page_count": 11,
+        "extractable_characters": 12931,
+        "file_size_bytes": 851756,
+        "format": "PDF 1.4",
+        "has_digital_text": true
+      },
+      "warnings": [
+        "LEGACY_FONT_ENCODING: Document uses ASCII glyph mapping from legacy Kannada desktop fonts (Nudi/Baraha layout) rather than Unicode UTF-8 Kannada characters. Text extraction yields ASCII characters (e.g., 'a$d* rbdrSefrJ'). Requires font-remapping or OCR conversion for natural language RAG."
+      ],
+      "notes": "Authoritative state legislative record containing full Government Orders (GO No. WCD 70 WDC 2023 dated 20-05-2023, 06-06-2023, 12-06-2023). Specifies benefit of Rs. 2,000/month to woman head of family named on Antyodaya, BPL, or APL ration card; explicitly disqualifies women or their husbands paying income tax or GST."
+    },
+    {
+      "scheme_id": "karnataka_anna_bhagya",
+      "scheme_name": "Anna Bhagya Scheme (Citizen's Charter)",
+      "jurisdiction": "state",
+      "issuing_authority": "Food, Civil Supplies & Consumer Affairs Department, Government of Karnataka",
+      "official_source_url": "https://ahara.karnataka.gov.in/Aharadept/Doc/citizen_charter_english.pdf",
+      "portal_url": "https://ahara.karnataka.gov.in/",
+      "document_title": "Citizen's Charter - Food, Civil Supplies & Consumer Affairs Department (Anna Bhagya Entitlements)",
+      "publication_or_effective_date": "2023-07-01",
+      "local_filename": "karnataka_anna_bhagya_citizen_charter_english.pdf",
+      "verification_status": "verified_scanned_image",
+      "document_metadata": {
+        "page_count": 13,
+        "extractable_characters": 0,
+        "file_size_bytes": 5104183,
+        "format": "PDF 1.4",
+        "has_digital_text": false
+      },
+      "warnings": [
+        "SCANNED_IMAGE_ONLY: 0 extractable text characters. Scanned image document requiring OCR processing to extract text chunks."
+      ],
+      "notes": "Official English citizen's charter issued by Food & Civil Supplies Department detailing food grain scale of issue (5 kg rice + DBT cash transfer of Rs. 170/person/month for remaining 5 kg under enhanced Anna Bhagya), Antyodaya Anna Yojana (AAY) quotas (35 kg/card), Priority Household (PHH) quotas (5 kg/member), and Fair Price Shop entitlements."
+    },
+    {
+      "scheme_id": "karnataka_sandhya_suraksha",
+      "scheme_name": "Sandhya Suraksha Yojana",
+      "jurisdiction": "state",
+      "issuing_authority": "Directorate of Social Security and Pensions, Revenue Department, Government of Karnataka",
+      "official_source_url": null,
+      "portal_url": "https://dssp.karnataka.gov.in/",
+      "document_title": "Sandhya Suraksha Scheme Guidelines (Portal Service Reference)",
+      "publication_or_effective_date": null,
+      "local_filename": null,
+      "verification_status": "unresolved",
+      "document_metadata": null,
+      "warnings": [
+        "UNRESOLVED_DOCUMENT: No standalone official government PDF guideline, gazette, or GO is hosted on a verifiable public HTTP endpoint on dssp.karnataka.gov.in or sevasindhu.karnataka.gov.in. Access is restricted to interactive portal application workflows (Nadakacheri / Seva Sindhu)."
+      ],
+      "notes": "Targeted at senior citizens aged 65+ with combined annual income below Rs. 20,000 and bank balance below Rs. 10,000 providing pension of Rs. 1,000–1,200/month. Because official PDF is not publicly hosted, marked UNRESOLVED in adherence to anti-hallucination rules.",
+      "recommended_alternative": {
+        "scheme_name": "Seva Sindhu Department of Kannada & Culture Welfare Scheme",
+        "issuing_authority": "Department of Kannada and Culture, Government of Karnataka",
+        "document_title": "Government Order No. KaSamSa 61 KaSamSe 2020",
+        "official_source_url": "https://sevasindhu.karnataka.gov.in/PDF/Kannada_Culture_GO.pdf",
+        "status": "candidate_for_future_phase"
+      }
+    }
+  ]
+}
