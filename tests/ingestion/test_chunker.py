@@ -30,6 +30,35 @@ def test_split_text_overlapping_windows() -> None:
         assert len(c) <= 120  # boundary snapping allows small leeway
 
 
+def test_split_text_keeps_every_word_with_zero_and_high_overlap() -> None:
+    words = [f"rule-{index:03}" for index in range(80)]
+    text = " ".join(words)
+
+    for overlap in (0, 29):
+        config = ChunkingConfig(
+            chunk_size=30,
+            chunk_overlap=overlap,
+            min_chunk_size=5,
+        )
+        chunks = split_text_into_chunks(text, config)
+        assert chunks
+        assert all(len(chunk) <= config.chunk_size for chunk in chunks)
+        assert all(any(word in chunk for chunk in chunks) for word in words)
+
+
+def test_min_chunk_size_avoids_tiny_early_chunk() -> None:
+    text = "a\nbcdefghijklmnopqrstuvwxyz"
+    config = ChunkingConfig(
+        chunk_size=12,
+        chunk_overlap=0,
+        min_chunk_size=6,
+    )
+
+    chunks = split_text_into_chunks(text, config)
+
+    assert len(chunks[0]) >= config.min_chunk_size
+
+
 def test_chunk_document_pages_provenance() -> None:
     metadata = DocumentMetadata(
         scheme_id="pm-kisan",

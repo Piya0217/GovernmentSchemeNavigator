@@ -24,6 +24,12 @@ def _extract_page(page: pymupdf.Page, page_number: int) -> PageData:
     """
     raw_text: str = page.get_text("text")
     stripped = raw_text.strip()
+    if not stripped and page.get_images(full=True):
+        msg = (
+            f"PDF page {page_number} contains images but no extractable text. "
+            "It may be a scanned page and requires OCR."
+        )
+        raise ScannedPDFError(msg)
     return PageData(
         page_number=page_number,
         raw_text=raw_text,
@@ -99,5 +105,10 @@ def load_pdf_pages(file_path: Path | str) -> list[PageData]:
             raise ScannedPDFError(msg)
 
         return pages
+    except (EmptyPDFError, ScannedPDFError, CorruptedPDFError):
+        raise
+    except Exception as err:
+        msg = f"Failed to extract pages from PDF; the file may be corrupted: {path}"
+        raise CorruptedPDFError(msg) from err
     finally:
         doc.close()

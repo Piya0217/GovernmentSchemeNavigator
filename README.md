@@ -120,7 +120,9 @@ Official PDF documents stored in `data/raw/` are parsed, cleaned, chunked, and w
 
 ### CLI Usage
 
-Ingest a scheme document with explicit metadata (example using the synthetic test fixture):
+Ingest a scheme document with explicit metadata (example using synthetic test data only; this is not an official source document):
+
+> `tests/fixtures/synthetic_sample_pm_kisan.pdf` is synthetic test data, not an official Government of India document. Do not use it as a source for real scheme guidance.
 
 ```bash
 python -m src.ingestion.cli \
@@ -132,6 +134,8 @@ python -m src.ingestion.cli \
   --chunk-overlap 100 \
   --output-dir data/processed
 ```
+
+The CLI does not overwrite an existing `<scheme-id>.json` by default. Pass `--overwrite` to replace it intentionally.
 
 > For production ingestion, place verified official government PDFs in `data/raw/` and point `--pdf-path` to the target file.
 

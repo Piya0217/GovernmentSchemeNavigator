@@ -67,6 +67,11 @@ def build_parser() -> argparse.ArgumentParser:
         type=str,
         help="Directory to save the processed JSON artifact.",
     )
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Replace an existing output JSON with the same scheme ID.",
+    )
     return parser
 
 
@@ -82,25 +87,25 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
-    pdf_file = Path(args.pdf_path)
-    metadata = DocumentMetadata(
-        scheme_id=args.scheme_id,
-        source_document=pdf_file.name,
-        official_source_url=args.official_url,
-        document_version=args.document_version,
-    )
-    chunk_config = ChunkingConfig(
-        chunk_size=args.chunk_size,
-        chunk_overlap=args.chunk_overlap,
-    )
-
     try:
+        pdf_file = Path(args.pdf_path)
+        metadata = DocumentMetadata(
+            scheme_id=args.scheme_id,
+            source_document=pdf_file.name,
+            official_source_url=args.official_url,
+            document_version=args.document_version,
+        )
+        chunk_config = ChunkingConfig(
+            chunk_size=args.chunk_size,
+            chunk_overlap=args.chunk_overlap,
+        )
         logger.info("Starting ingestion for scheme: %s", metadata.scheme_id)
         doc = run_ingestion_pipeline(
             pdf_path=pdf_file,
             metadata=metadata,
             chunk_config=chunk_config,
             output_dir=args.output_dir,
+            overwrite=args.overwrite,
         )
         logger.info(
             "Successfully ingested %s: %d pages, %d chunks saved to %s/%s.json",

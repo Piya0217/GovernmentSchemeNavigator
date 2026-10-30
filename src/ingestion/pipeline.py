@@ -38,12 +38,15 @@ def _clean_pages(raw_pages: list[PageData]) -> list[PageData]:
     return cleaned_pages
 
 
-def _save_processed_document(doc: ProcessedDocument, output_dir: Path) -> Path:
+def _save_processed_document(
+    doc: ProcessedDocument, output_dir: Path, overwrite: bool = False
+) -> Path:
     """Save processed document to a JSON file in the target directory.
 
     Args:
         doc: ProcessedDocument model instance.
         output_dir: Destination folder path.
+        overwrite: Whether to replace an existing artifact.
 
     Returns:
         Path to the saved JSON file.
@@ -52,7 +55,10 @@ def _save_processed_document(doc: ProcessedDocument, output_dir: Path) -> Path:
     destination = output_dir / f"{doc.scheme_id}.json"
     doc_dict = doc.model_dump(mode="json")
 
-    with open(destination, "w", encoding="utf-8") as f:
+    # Exclusive creation prevents an accidental rerun from silently replacing
+    # an existing processed artifact.
+    mode = "w" if overwrite else "x"
+    with destination.open(mode, encoding="utf-8") as f:
         json.dump(doc_dict, f, ensure_ascii=False, indent=2)
 
     return destination
@@ -63,6 +69,7 @@ def run_ingestion_pipeline(
     metadata: DocumentMetadata,
     chunk_config: ChunkingConfig | None = None,
     output_dir: Path | str = "data/processed",
+    overwrite: bool = False,
 ) -> ProcessedDocument:
     """Execute the end-to-end ingestion pipeline for a single PDF.
 
@@ -71,6 +78,7 @@ def run_ingestion_pipeline(
         metadata: Document metadata including scheme ID and official URL.
         chunk_config: Optional chunking parameters (size and overlap).
         output_dir: Directory where processed JSON is written.
+        overwrite: Whether to replace an existing processed JSON artifact.
 
     Returns:
         ProcessedDocument containing all metadata and chunks.
@@ -91,5 +99,7 @@ def run_ingestion_pipeline(
         chunks=chunks,
     )
 
-    _save_processed_document(processed_doc, Path(output_dir).resolve())
+    _save_processed_document(
+        processed_doc, Path(output_dir).resolve(), overwrite=overwrite
+    )
     return processed_doc

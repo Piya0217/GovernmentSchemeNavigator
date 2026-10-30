@@ -1,5 +1,6 @@
 """Unit tests for pdf_loader module."""
 
+import base64
 from collections.abc import Callable
 from pathlib import Path
 
@@ -61,6 +62,40 @@ def test_load_pdf_scanned_raises_scanned_pdf_error(
     # 2 pages with no text content
     pdf_path = make_pdf(["", ""], "scanned.pdf")
     with pytest.raises(ScannedPDFError, match="contains 2 page.*no extractable text"):
+        load_pdf_pages(pdf_path)
+
+
+def test_load_pdf_image_only_document_is_reported_as_scanned(tmp_path: Path) -> None:
+    image_png = base64.b64decode(
+        "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAIAAAACUFjqAAAACXBIWXMAAA7EAAAOxAGVKw4b"
+        "AAAADUlEQVR4nGNgGAWkAwABNgABVtF/yAAAAABJRU5ErkJggg=="
+    )
+    document = pymupdf.open()
+    page = document.new_page()
+    page.insert_image(page.rect, stream=image_png)
+    pdf_path = tmp_path / "image_only.pdf"
+    document.save(pdf_path)
+    document.close()
+
+    with pytest.raises(ScannedPDFError, match="no extractable text"):
+        load_pdf_pages(pdf_path)
+
+
+def test_load_pdf_mixed_document_reports_scanned_page(tmp_path: Path) -> None:
+    image_png = base64.b64decode(
+        "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAIAAAACUFjqAAAACXBIWXMAAA7EAAAOxAGVKw4b"
+        "AAAADUlEQVR4nGNgGAWkAwABNgABVtF/yAAAAABJRU5ErkJggg=="
+    )
+    document = pymupdf.open()
+    text_page = document.new_page()
+    text_page.insert_text((72, 72), "Selectable source text.")
+    scanned_page = document.new_page()
+    scanned_page.insert_image(scanned_page.rect, stream=image_png)
+    pdf_path = tmp_path / "mixed_document.pdf"
+    document.save(pdf_path)
+    document.close()
+
+    with pytest.raises(ScannedPDFError, match="page 2.*OCR"):
         load_pdf_pages(pdf_path)
 
 

@@ -10,19 +10,19 @@ from src.ingestion.schemas import (
 )
 
 
-def _find_split_point(text: str, start: int, max_end: int, lookback: int) -> int:
+def _find_split_point(text: str, start: int, max_end: int, min_chunk_size: int) -> int:
     """Find a natural boundary (newline or space) before max_end to avoid cutting words.
 
     Args:
         text: Full page text.
         start: Start index of current window.
         max_end: Hard maximum cutoff index.
-        lookback: Maximum number of characters to search backwards.
+        min_chunk_size: Minimum preferred size before choosing a natural boundary.
 
     Returns:
         Index where the chunk should end.
     """
-    search_start = max(start + 1, max_end - lookback)
+    search_start = max(start + 1, start + min_chunk_size)
     slice_to_search = text[search_start:max_end]
 
     newline_pos = slice_to_search.rfind("\n")
@@ -56,8 +56,6 @@ def split_text_into_chunks(text: str, config: ChunkingConfig) -> list[str]:
     chunks: list[str] = []
     start = 0
     text_len = len(cleaned)
-    lookback = max(1, min(config.chunk_overlap, int(config.chunk_size * 0.25)))
-
     while start < text_len:
         max_end = start + config.chunk_size
         if max_end >= text_len:
@@ -66,7 +64,7 @@ def split_text_into_chunks(text: str, config: ChunkingConfig) -> list[str]:
                 chunks.append(final_piece)
             break
 
-        split_point = _find_split_point(cleaned, start, max_end, lookback)
+        split_point = _find_split_point(cleaned, start, max_end, config.min_chunk_size)
         chunk_piece = cleaned[start:split_point].strip()
         if chunk_piece:
             chunks.append(chunk_piece)

@@ -1,8 +1,46 @@
 """Pydantic schemas and data models for PDF ingestion."""
 
 from datetime import UTC, datetime
+from typing import Annotated
+from urllib.parse import urlsplit
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import (
+    AfterValidator,
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    StringConstraints,
+    model_validator,
+)
+
+
+def _validate_http_url(value: str) -> str:
+    """Require an HTTP(S) URL without embedded credentials or whitespace."""
+    parsed = urlsplit(value)
+    if (
+        any(character.isspace() for character in value)
+        or parsed.scheme not in {"http", "https"}
+        or not parsed.hostname
+        or parsed.username is not None
+        or parsed.password is not None
+    ):
+        msg = "official_source_url must be a valid HTTP(S) URL without credentials."
+        raise ValueError(msg)
+    return value
+
+
+SchemeId = Annotated[
+    str,
+    StringConstraints(
+        strip_whitespace=True,
+        min_length=1,
+        max_length=128,
+        pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]*$",
+    ),
+]
+NonEmptyString = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+HttpUrlString = Annotated[str, AfterValidator(_validate_http_url)]
 
 
 class DocumentMetadata(BaseModel):
@@ -10,24 +48,18 @@ class DocumentMetadata(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    scheme_id: str = Field(
-        ...,
-        min_length=1,
-        description="Unique identifier for the scheme (e.g. 'pm-kisan').",
+    scheme_id: SchemeId = Field(
+        ..., description="Unique identifier for the scheme (e.g. 'pm-kisan')."
     )
-    source_document: str = Field(
-        ...,
-        min_length=1,
-        description="Filename or path of the source document.",
+    source_document: NonEmptyString = Field(
+        ..., description="Filename or path of the source document."
     )
-    official_source_url: str = Field(
+    official_source_url: HttpUrlString = Field(
         ...,
-        min_length=1,
         description="Official government portal URL where the document was published.",
     )
-    document_version: str | None = Field(
-        default=None,
-        description="Optional version or release year of the document.",
+    document_version: NonEmptyString | None = Field(
+        default=None, description="Optional version or release year of the document."
     )
 
 
@@ -49,7 +81,10 @@ class ChunkingConfig(BaseModel):
     min_chunk_size: int = Field(
         default=50,
         ge=0,
-        description="Minimum character length for a chunk to be preserved.",
+        description=(
+            "Minimum preferred size before choosing a natural split point; "
+            "short final chunks are retained to avoid data loss."
+        ),
     )
 
     @model_validator(mode="after")
@@ -97,9 +132,9 @@ class SchemeChunk(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    scheme_id: str = Field(..., description="Unique scheme identifier.")
-    source_document: str = Field(..., description="Original PDF file name.")
-    official_source_url: str = Field(
+    scheme_id: SchemeId = Field(..., description="Unique scheme identifier.")
+    source_document: NonEmptyString = Field(..., description="Original PDF file name.")
+    official_source_url: HttpUrlString = Field(
         ..., description="Official URL for the scheme document."
     )
     page_number: int = Field(
@@ -113,11 +148,11 @@ class SchemeChunk(BaseModel):
         description="Global 0-indexed sequence position of the chunk in the document.",
     )
     text: str = Field(..., min_length=1, description="Text content of the chunk.")
-    extraction_timestamp: datetime = Field(
+    extraction_timestamp: AwareDatetime = Field(
         default_factory=lambda: datetime.now(UTC),
         description="UTC timestamp when the chunk was extracted.",
     )
-    document_version: str | None = Field(
+    document_version: NonEmptyString | None = Field(
         default=None,
         description="Document version or revision if specified.",
     )
@@ -126,11 +161,30 @@ class SchemeChunk(BaseModel):
 class ProcessedDocument(BaseModel):
     """Complete structured output of the ingestion pipeline for a scheme PDF."""
 
-    scheme_id: str
-    source_document: str
-    official_source_url: str
-    document_version: str | None = None
+    scheme_id: SchemeId
+    source_document: NonEmptyString
+    official_source_url: HttpUrlString
+    document_version: NonEmptyString | None = None
     total_pages: int = Field(..., ge=0)
     total_chunks: int = Field(..., ge=0)
-    processed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    processed_at: AwareDatetime = Field(default_factory=lambda: datetime.now(UTC))
     chunks: list[SchemeChunk] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_chunk_consistency(self) -> "ProcessedDocument":
+        """Ensure output counts and chunk provenance agree with the document."""
+        if self.total_chunks != len(self.chunks):
+            msg = "total_chunks must match the number of chunks."
+            raise ValueError(msg)
+        if any(chunk.scheme_id != self.scheme_id for chunk in self.chunks):
+            msg = "Every chunk must have the same scheme_id as the document."
+            raise ValueError(msg)
+        if any(chunk.page_number > self.total_pages for chunk in self.chunks):
+            msg = "Chunk page_number cannot exceed total_pages."
+            raise ValueError(msg)
+        if sorted(chunk.chunk_index for chunk in self.chunks) != list(
+            range(self.total_chunks)
+        ):
+            msg = "Chunk indexes must be unique and sequential from zero."
+            raise ValueError(msg)
+        return self

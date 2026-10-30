@@ -121,6 +121,31 @@ def test_pipeline_missing_file_raises(tmp_path: Path) -> None:
         )
 
 
+def test_pipeline_does_not_overwrite_existing_output(
+    make_pdf: Callable[..., Path], tmp_path: Path
+) -> None:
+    pdf_path = make_pdf(["Scheme source text."], "source.pdf")
+    output_dir = tmp_path / "processed"
+    output_dir.mkdir()
+    output_path = output_dir / "safe-scheme.json"
+    original_output = b"existing artifact"
+    output_path.write_bytes(original_output)
+    metadata = DocumentMetadata(
+        scheme_id="safe-scheme",
+        source_document=pdf_path.name,
+        official_source_url="https://example.gov.in/scheme.pdf",
+    )
+
+    with pytest.raises(FileExistsError):
+        run_ingestion_pipeline(
+            pdf_path=pdf_path,
+            metadata=metadata,
+            output_dir=output_dir,
+        )
+
+    assert output_path.read_bytes() == original_output
+
+
 def test_pipeline_scanned_pdf_raises(
     make_pdf: Callable[..., Path], tmp_path: Path
 ) -> None:

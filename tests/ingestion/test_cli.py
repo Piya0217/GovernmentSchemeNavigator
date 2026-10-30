@@ -44,3 +44,20 @@ def test_cli_failure_on_missing_file(tmp_path: Path) -> None:
 
     exit_code = main(args)
     assert exit_code != 0
+
+
+def test_cli_invalid_chunk_options_return_nonzero(tmp_path: Path) -> None:
+    args = [
+        "--pdf-path",
+        str(tmp_path / "unused.pdf"),
+        "--scheme-id",
+        "test-scheme",
+        "--official-url",
+        "https://example.gov.in",
+        "--chunk-size",
+        "100",
+        "--chunk-overlap",
+        "100",
+    ]
+
+    assert main(args) == 1

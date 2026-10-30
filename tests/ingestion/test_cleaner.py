@@ -49,6 +49,18 @@ def test_clean_text_preserves_kannada_unicode() -> None:
     assert "ಮಾನದಂಡಗಳು" in cleaned
 
 
+def test_clean_text_preserves_tab_separated_table_columns() -> None:
+    raw = "Age\tAnnual income\tBenefit\n18\t₹60,000\t₹6,000"
+    cleaned = clean_text(raw)
+    assert cleaned == "Age | Annual income | Benefit\n18 | ₹60,000 | ₹6,000"
+
+
+def test_clean_text_preserves_aligned_table_columns() -> None:
+    raw = "Age      Annual income  Benefit\n18       Rs. 60,000      ₹6,000"
+    cleaned = clean_text(raw)
+    assert cleaned == "Age | Annual income | Benefit\n18 | Rs. 60,000 | ₹6,000"
+
+
 def test_clean_text_handles_empty_or_whitespace() -> None:
     assert clean_text("") == ""
     assert clean_text("   \n\n\t   ") == ""
