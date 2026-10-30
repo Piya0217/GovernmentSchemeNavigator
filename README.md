@@ -1,240 +1,175 @@
 # Government Scheme Navigator
 
-An AI-powered multilingual assistant that helps Indian citizens discover government welfare schemes and check their eligibility using official scheme documents.
+A multilingual English/Kannada application for discovering Indian government
+welfare schemes and exploring evidence from verified official documents. The
+citizen-facing Streamlit app calls the FastAPI backend. Retrieval returns
+extractive passages and provenance; eligibility decisions are reserved for a
+deterministic, validated rules engine.
 
----
+## Current capabilities and limits
 
-## Features (Planned)
+- The registry API lists all registered schemes and their verification status.
+  Registry membership does not mean a scheme is present in the retrieval index.
+- The informational query API delegates to the Phase 2E `AnswerBuilder` and
+  preserves its abstention status, evidence, and source metadata. Retrieved
+  information is not an official eligibility decision.
+- The citizen app supports English and Kannada interface labels, scheme
+  discovery, and evidence-based questions.
+- The eligibility API delegates to the Phase 3 deterministic engine and accepts
+  its `CitizenProfile` schema. No production rule sets are checked in yet, so
+  registered schemes currently return `unsupported_scheme` without a decision.
+  Configured rules must resolve through the Phase 3 evidence sidecar to a
+  matching exact-source catalogue record; invalid provenance fails closed.
+- This checkout does not contain a ChromaDB index. Retrieval reports its
+  unavailable/missing/empty state until a verified index is provisioned.
 
-- **Multilingual support** — queries in Hindi, Tamil, Telugu, Bengali, and more
-- **Semantic search** over official government scheme documents (PDF/HTML)
-- **Deterministic eligibility engine** — the LLM never makes final decisions
-- **Transparent reasoning** — every eligibility result cites source documents
-- **REST API** via FastAPI
+## Architecture
 
----
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| API | FastAPI + Uvicorn |
-| Embeddings | Sentence Transformers (multilingual) |
-| Vector Store | ChromaDB |
-| PDF Parsing | PyMuPDF (fitz) |
-| Data Validation | Pydantic v2 |
-| Testing | pytest |
-| Linting | Ruff |
-| Config | pydantic-settings + `.env` |
-
----
-
-## Project Structure
-
-```
-government-scheme-navigator/
-├── AGENTS.md           # Architecture & coding rules
-├── README.md           # This file
-├── pyproject.toml      # Project metadata & dependencies
-├── .env.example        # Environment variable template
-├── .gitignore
-├── data/
-│   ├── raw/            # Source PDFs (read-only at runtime)
-│   └── processed/      # Generated chunks & metadata
-├── src/
-│   ├── api/            # FastAPI app & routers
-│   ├── agent/          # LLM orchestration & intent routing
-│   ├── retrieval/      # ChromaDB search helpers
-│   ├── rules/          # Deterministic eligibility engine
-│   ├── ingestion/      # PDF → chunk → embed pipeline
-│   └── i18n/           # Language detection & translation
-├── tests/              # pytest test suite
-├── evals/              # Offline evaluation datasets
-└── app/                # Frontend (Phase N)
+```text
+Citizen browser
+    │
+    ▼
+Streamlit UI (app/citizen_app.py)
+    │ HTTP
+    ▼
+FastAPI (src/api/)
+    │
+    ├── Query orchestration → Phase 2E AnswerBuilder → ChromaDB
+    ├── Scheme listing → data/scheme_registry.json
+    └── Eligibility → Phase 3 deterministic engine → data/rules/<scheme_id>.json
 ```
 
----
+`streamlit_app.py` is the Phase 1 registry demo. `streamlit_rag_app.py` is the
+Phase 2E local retrieval demo. The citizen-facing app is `app/citizen_app.py`;
+it consumes the API rather than implementing retrieval or eligibility.
 
-## Prerequisites
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for endpoint contracts and
+[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for setup and deployment preparation.
 
-- **Python 3.11+**
-- `pip` package manager
-- Git
+## Requirements and setup
 
----
+- Python 3.11 or newer.
+- Git and pip.
+- The embedding model and a compatible indexed ChromaDB database are needed for
+  informational answers. Health checks do not download or load the model.
 
-## Setup
-
-### 1. Clone the repository
+From the repository root:
 
 ```bash
-git clone <repo-url>
-cd government-scheme-navigator
-```
-
-### 2. Create a virtual environment
-
-```bash
-python -m venv .venv
-
-# Windows (PowerShell)
-.\.venv\Scripts\Activate.ps1
-
-# macOS / Linux
+python3.11 -m venv .venv
 source .venv/bin/activate
-```
-
-### 3. Install dependencies
-
-```bash
-pip install -e ".[dev]"
-```
-
-### 4. Configure environment variables
-
-```bash
+python -m pip install -e ".[dev]" -r requirements.txt
 cp .env.example .env
-# Edit .env with your values
 ```
 
----
+On Windows PowerShell, activate with:
 
-## Running the Application
+```powershell
+.venv\Scripts\Activate.ps1
+```
 
-### Development server
+`streamlit` is listed in `requirements.txt`; `pip install -e ".[dev]" -r
+requirements.txt` installs it alongside the project and development extras.
+Use an absolute `CHROMA_PERSIST_DIR` to select an external index location. A
+relative Chroma path resolves from the repository root, independent of the
+launch working directory. The default is `./data/chroma`.
+Set `CORS_ORIGINS` to a JSON list of explicit browser origins if a browser
+client calls FastAPI directly. The default empty allowlist is sufficient for
+the Streamlit app, which calls the API server-to-server.
+
+## Start the services
+
+Start FastAPI from the repository root:
 
 ```bash
 uvicorn src.api.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-The API will be available at:
-- **Health check**: `GET http://localhost:8000/health`
-- **Interactive docs**: `http://localhost:8000/docs`
-- **OpenAPI schema**: `http://localhost:8000/openapi.json`
-
----
-
-## Document Ingestion (Phase 1)
-
-Official PDF documents stored in `data/raw/` are parsed, cleaned, chunked, and written to `data/processed/` as structured JSON artifacts. The original source PDFs are preserved strictly read-only.
-
-### CLI Usage
-
-Ingest a scheme document with explicit metadata (example using synthetic test data only; this is not an official source document):
-
-> `tests/fixtures/synthetic_sample_pm_kisan.pdf` is synthetic test data, not an official Government of India document. Do not use it as a source for real scheme guidance.
+In a second terminal with the same virtual environment:
 
 ```bash
-python -m src.ingestion.cli \
-  --pdf-path tests/fixtures/synthetic_sample_pm_kisan.pdf \
-  --scheme-id pm-kisan-sample \
-  --official-url "https://pmkisan.gov.in" \
-  --document-version "2024-v1" \
-  --chunk-size 500 \
-  --chunk-overlap 100 \
-  --output-dir data/processed
+streamlit run app/citizen_app.py
 ```
 
-The CLI does not overwrite an existing `<scheme-id>.json` by default. Pass `--overwrite` to replace it intentionally.
+The UI reads `API_BASE_URL` from the repository `.env` file or environment;
+the default is `http://127.0.0.1:8000`.
 
-> For production ingestion, place verified official government PDFs in `data/raw/` and point `--pdf-path` to the target file.
-
-### Python API Usage
-
-```python
-from pathlib import Path
-from src.ingestion import (
-    run_ingestion_pipeline,
-    DocumentMetadata,
-    ChunkingConfig,
-)
-
-metadata = DocumentMetadata(
-    scheme_id="pm-kisan-sample",
-    source_document="synthetic_sample_pm_kisan.pdf",
-    official_source_url="https://pmkisan.gov.in",
-    document_version="2024-v1",
-)
-
-config = ChunkingConfig(chunk_size=500, chunk_overlap=100)
-
-doc = run_ingestion_pipeline(
-    pdf_path=Path("tests/fixtures/synthetic_sample_pm_kisan.pdf"),
-    metadata=metadata,
-    chunk_config=config,
-    output_dir=Path("data/processed"),
-)
-
-print(f"Ingested {doc.total_chunks} chunks across {doc.total_pages} pages.")
-```
-
-### Processed Output Structure
-
-The output is saved as `data/processed/<scheme_id>.json`. Each chunk preserves full provenance:
-
-- `scheme_id`: Identifier of the scheme.
-- `source_document`: File name of the source PDF.
-- `official_source_url`: Government portal URL.
-- `page_number`: 1-indexed source page.
-- `chunk_index`: 0-indexed sequential position across the entire document.
-- `text`: Cleaned and normalized text content.
-- `extraction_timestamp`: ISO 8601 UTC timestamp.
-- `document_version`: Version string if provided.
-
----
-
-## Running Tests
+Other demos remain available:
 
 ```bash
-# All fast unit tests
-pytest tests/ -v
-
-# Skip slow tests (LLM / ChromaDB dependent)
-pytest tests/ -v -m "not slow"
-
-# With coverage
-pytest tests/ --cov=src --cov-report=term-missing
+streamlit run streamlit_app.py       # Phase 1 registry demo
+streamlit run streamlit_rag_app.py   # Phase 2E local RAG demo
 ```
 
----
+## API endpoints
 
-## Linting & Formatting
+Interactive OpenAPI documentation is at `http://127.0.0.1:8000/docs`.
+
+| Method and path | Purpose |
+|---|---|
+| `GET /health` | Existing liveness response; preserved for compatibility |
+| `GET /api/health` | Retrieval, registry, and eligibility component status |
+| `GET /api/schemes` | Registry listing; optional `q`, `jurisdiction`, and `verification_status` filters |
+| `POST /api/query` | Informational retrieval with official evidence and provenance |
+| `POST /api/eligibility/check` | Deterministic eligibility check using a configured Phase 3 rule set |
+
+Example informational request:
 
 ```bash
-# Format check
+curl -X POST http://127.0.0.1:8000/api/query \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"What does PM-KISAN provide?","scheme_id":"central_pm_kisan"}'
+```
+
+Supported responses contain verbatim evidence passages with scheme ID, source
+document, official URL, page number, document version, chunk identifiers, and
+retrieval scores. Unsupported or insufficient-evidence queries return a typed
+abstention. A retrieval service that is not configured returns HTTP 503.
+
+## Ingestion and indexing
+
+Original government documents are stored under `data/raw/` and treated as
+read-only. The Phase 1 ingestion CLI creates processed document JSON; the
+Phase 2 retrieval CLI indexes eligible processed documents into ChromaDB.
+Consult the CLI `--help` output for available options:
+
+```bash
+python -m src.ingestion.cli --help
+python -m src.retrieval.cli --help
+```
+
+Only documents that meet the retrieval indexer's verification requirements are
+indexed. Scanned, legacy-font, unresolved, or otherwise unindexed sources must
+not be presented as searchable. The index should be generated from verified
+source artifacts and stored on a persistent volume for deployment.
+
+## Tests and quality checks
+
+```bash
+python -m pytest tests/api -q
+python -m pytest -q
 ruff format --check .
-
-# Lint check
 ruff check .
-
-# Lint with auto-fix
-ruff check . --fix
 ```
 
----
+Automated tests use temporary data and mocks for external services. Two PDF
+tests skip when the host has no suitable Indic system font; see
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for current limitations.
 
-## Critical Safety Principle
+## Privacy and important notice
 
-> **The LLM never makes final eligibility decisions.**
+The eligibility form sends only the fields entered by the citizen when they
+submit; the application does not persist that profile. Do not enter Aadhaar
+numbers, phone numbers, bank details, or other sensitive personal information.
+An outcome applies only to the configured rules and is not an official
+government decision or a guarantee of benefit approval. Always check the cited
+source document and relevant government authority.
 
-All eligibility determinations are made exclusively by the deterministic Python rules engine in `src/rules/`. See [AGENTS.md](./AGENTS.md) for the full safety contract.
+## Project phases
 
----
-
-## Development Phases
-
-| Phase | Description | Status |
-|---|---|---|
-| 0 | Project initialization & setup | ✅ Complete |
-| 1 | PDF ingestion pipeline | ✅ Complete |
-| 2 | Semantic retrieval (ChromaDB) | Planned |
-| 3 | Deterministic rules engine | Planned |
-| 4 | Agent layer & API | Planned |
-| 5 | Multilingual support | Planned |
-| 6 | Frontend | Planned |
-
----
-
-## License
-
-TBD
+Phase 1 ingestion, Phase 2 retrieval, Phase 3 rule engine and catalogue code,
+Phase 4 API, and the bilingual Phase 5 citizen UI are present in this checkout.
+Phase 3 data includes no executable rule sets; the evidence catalogue and
+candidate-link sidecar are empty. Real scheme eligibility outcomes therefore
+remain unavailable until reviewed rule data and source evidence are supplied.
+Production Phase 6 deployment and hosting are not configured.
