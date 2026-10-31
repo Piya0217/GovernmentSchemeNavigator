@@ -73,14 +73,14 @@ Official PDF / Document
 |---|---|---|
 | Make final eligibility decisions | NEVER | Must be deterministic & auditable |
 | Activate rules without validation | NEVER | Rules require human review against official docs |
-| Produce a positive result from missing data | NEVER | Uncertainty -> NOT eligible |
+| Treat missing profile data as a failed rule or confirmed ineligibility | NEVER | Missing required information is unevaluable, not a failed criterion |
 | Access external URLs or services | NEVER | Scope creep / data integrity |
 
 ### 3.2 LLM Permitted Actions
 
 | Action | Allowed? | Notes |
 |---|---|---|
-| Extract _candidate_ rules from documents | Yes | Stored as `pending`, not `active` |
+| Extract _candidate_ rules from documents | Yes | Stored as `PENDING`, not `ACTIVE` |
 | Translate or rephrase scheme descriptions | Yes | Output is informational only |
 | Identify relevant schemes from user query | Yes | Retrieval shortlisting only |
 | Explain eligibility criteria in natural language | Yes | Must cite source document |
@@ -89,18 +89,34 @@ Official PDF / Document
 
 - All eligibility decisions are made **exclusively** by the deterministic Python
   rules engine in `src/rules/`.
-- A rule must be in `status: active` (validated by a human or validation
-  script against the official document) before it is applied.
-- When any required field is `None` / missing -> the rule **fails** (not eligible).
+- A rule must have `status: ACTIVE` and pass activation validation with matching
+  approval evidence before it is evaluated. Status alone does not prove approval.
+- A missing required citizen-profile field produces
+  `RuleOutcome.UNEVALUABLE`, **not** `RuleOutcome.FAIL`.
+- Aggregate mandatory rule outcomes in this order:
+  - Any mandatory `FAIL` -> `EligibilityOutcome.INELIGIBLE`.
+  - Otherwise, any mandatory `UNEVALUABLE` ->
+    `EligibilityOutcome.NEEDS_MORE_INFORMATION`.
+  - All mandatory rules `PASS` -> `EligibilityOutcome.ELIGIBLE`.
+- Optional rule outcomes are reported but never override the mandatory outcome.
+- For future API responses, `eligible` is `true` only when the outcome is
+  `ELIGIBLE`; it is `false` for both `INELIGIBLE` and
+  `NEEDS_MORE_INFORMATION`.
 - Rules are versioned. Any change increments the schema version.
 
 ### 3.4 Uncertainty Policy
 
 > **Missing or uncertain information MUST NOT produce a positive eligibility
-> result.**
+> result or be presented as a confirmed finding of ineligibility.**
 
-If the user has not provided a required field, the engine returns:
-`{"eligible": false, "reason": "insufficient_information", "missing_fields": [...]}`
+If a required profile field is missing, its rule outcome is
+`UNEVALUABLE`. If no mandatory rule has failed, the overall outcome is
+`NEEDS_MORE_INFORMATION`, and the explanation identifies the missing field(s).
+This outcome means eligibility has not been established; it does **not** mean
+the person has been found ineligible. A future API must set `eligible: false`
+for this outcome while preserving the distinct outcome and explanation. When a
+mandatory rule has failed, the overall outcome is `INELIGIBLE` even if another
+mandatory rule is unevaluable.
 
 ---
 

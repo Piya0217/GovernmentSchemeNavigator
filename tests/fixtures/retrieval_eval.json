@@ -1,0 +1,194 @@
+{
+  "version": "1.0.0",
+  "description": "Evaluation dataset for measuring retrieval quality across indexed schemes.",
+  "schemes_evaluated": [
+    "central_pm_kisan",
+    "central_pmjay",
+    "central_pm_vishwakarma",
+    "central_sukanya_samriddhi"
+  ],
+  "queries": [
+    {
+      "id": "en_kisan_01",
+      "language": "en",
+      "query": "What is the financial benefit provided under PM-KISAN?",
+      "expected_schemes": ["central_pm_kisan"],
+      "query_type": "explicit_scheme"
+    },
+    {
+      "id": "en_kisan_02",
+      "language": "en",
+      "query": "Who are the institutional landholders excluded from PM-KISAN?",
+      "expected_schemes": ["central_pm_kisan"],
+      "query_type": "explicit_scheme"
+    },
+    {
+      "id": "en_kisan_03",
+      "language": "en",
+      "query": "What is the definition of a small and marginal farmer family in PM-KISAN operational guidelines?",
+      "expected_schemes": ["central_pm_kisan"],
+      "query_type": "explicit_scheme"
+    },
+    {
+      "id": "en_pmjay_01",
+      "language": "en",
+      "query": "How are beneficiaries identified for Ayushman Bharat PM-JAY?",
+      "expected_schemes": ["central_pmjay"],
+      "query_type": "explicit_scheme"
+    },
+    {
+      "id": "en_pmjay_02",
+      "language": "en",
+      "query": "What are the SECC 2011 deprivation criteria for rural households in PM-JAY?",
+      "expected_schemes": ["central_pmjay"],
+      "query_type": "explicit_scheme"
+    },
+    {
+      "id": "en_pmjay_03",
+      "language": "en",
+      "query": "What is the process for golden card verification under Ayushman Bharat?",
+      "expected_schemes": ["central_pmjay"],
+      "query_type": "explicit_scheme"
+    },
+    {
+      "id": "en_vishwakarma_01",
+      "language": "en",
+      "query": "What trades and craftspeople are covered under the PM Vishwakarma scheme?",
+      "expected_schemes": ["central_pm_vishwakarma"],
+      "query_type": "explicit_scheme"
+    },
+    {
+      "id": "en_vishwakarma_02",
+      "language": "en",
+      "query": "What is the skill training incentive and toolkit assistance in PM Vishwakarma?",
+      "expected_schemes": ["central_pm_vishwakarma"],
+      "query_type": "explicit_scheme"
+    },
+    {
+      "id": "en_vishwakarma_03",
+      "language": "en",
+      "query": "What are the collateral-free enterprise credit tranches under PM Vishwakarma?",
+      "expected_schemes": ["central_pm_vishwakarma"],
+      "query_type": "explicit_scheme"
+    },
+    {
+      "id": "en_sukanya_01",
+      "language": "en",
+      "query": "What is the maximum age limit for a girl child to open a Sukanya Samriddhi account?",
+      "expected_schemes": ["central_sukanya_samriddhi"],
+      "query_type": "explicit_scheme"
+    },
+    {
+      "id": "en_sukanya_02",
+      "language": "en",
+      "query": "What are the minimum and maximum yearly deposit limits for Sukanya Samriddhi Yojana?",
+      "expected_schemes": ["central_sukanya_samriddhi"],
+      "query_type": "explicit_scheme"
+    },
+    {
+      "id": "en_sukanya_03",
+      "language": "en",
+      "query": "What are the withdrawal rules for higher education in Sukanya Samriddhi account?",
+      "expected_schemes": ["central_sukanya_samriddhi"],
+      "query_type": "explicit_scheme"
+    },
+    {
+      "id": "en_generic_01",
+      "language": "en",
+      "query": "Government financial assistance and savings accounts for girl child",
+      "expected_schemes": ["central_sukanya_samriddhi"],
+      "query_type": "generic_intent"
+    },
+    {
+      "id": "en_generic_02",
+      "language": "en",
+      "query": "Health cover and hospitalization assistance for poor families",
+      "expected_schemes": ["central_pmjay"],
+      "query_type": "generic_intent"
+    },
+    {
+      "id": "en_generic_03",
+      "language": "en",
+      "query": "Income support scheme for farmers",
+      "expected_schemes": ["central_pm_kisan"],
+      "query_type": "generic_intent"
+    },
+    {
+      "id": "en_generic_04",
+      "language": "en",
+      "query": "Loan and toolkit assistance for traditional carpenters and blacksmiths",
+      "expected_schemes": ["central_pm_vishwakarma"],
+      "query_type": "generic_intent"
+    },
+    {
+      "id": "en_outofscope_01",
+      "language": "en",
+      "query": "How do I renew my four-wheeler motor vehicle driving license?",
+      "expected_schemes": [],
+      "query_type": "out_of_scope"
+    },
+    {
+      "id": "en_outofscope_02",
+      "language": "en",
+      "query": "What is the launch schedule for ISRO Chandrayaan mission?",
+      "expected_schemes": [],
+      "query_type": "out_of_scope"
+    },
+    {
+      "id": "kn_kisan_01",
+      "language": "kn",
+      "query": "ಪಿಎಂ ಕಿಸಾನ್ ಯೋಜನೆಯಡಿ ರೈತರಿಗೆ ಎಷ್ಟು ಆರ್ಥಿಕ ನೆರವು ಸಿಗುತ್ತದೆ?",
+      "expected_schemes": ["central_pm_kisan"],
+      "query_type": "explicit_scheme"
+    },
+    {
+      "id": "kn_kisan_02",
+      "language": "kn",
+      "query": "ರೈತರಿಗೆ ಆರ್ಥಿಕ ನೆರವು ನೀಡುವ ಯೋಜನೆ ಯಾವುದು?",
+      "expected_schemes": ["central_pm_kisan"],
+      "query_type": "generic_intent"
+    },
+    {
+      "id": "kn_pmjay_01",
+      "language": "kn",
+      "query": "ಆಯುಷ್ಮಾನ್ ಭಾರತ್ ಯೋಜನೆಯಡಿ ಚಿಕಿತ್ಸಾ ಸೌಲಭ್ಯ ಹೇಗೆ ಪಡೆಯುವುದು?",
+      "expected_schemes": ["central_pmjay"],
+      "query_type": "explicit_scheme"
+    },
+    {
+      "id": "kn_pmjay_02",
+      "language": "kn",
+      "query": "ಬಡ ಕುಟುಂಬಗಳಿಗೆ ಆರೋಗ್ಯ ವಿಮೆ ನೀಡುವ ಯೋಜನೆ ಯಾವುದು?",
+      "expected_schemes": ["central_pmjay"],
+      "query_type": "generic_intent"
+    },
+    {
+      "id": "kn_vishwakarma_01",
+      "language": "kn",
+      "query": "ಪಿಎಂ ವಿಶ್ವಕರ್ಮ ಯೋಜನೆಯಡಿ ಕುಶಲಕರ್ಮಿಗಳಿಗೆ ಸಿಗುವ ಸೌಲಭ್ಯಗಳು ಯಾವುವು?",
+      "expected_schemes": ["central_pm_vishwakarma"],
+      "query_type": "explicit_scheme"
+    },
+    {
+      "id": "kn_sukanya_01",
+      "language": "kn",
+      "query": "ಸುಕನ್ಯಾ ಸಮೃದ್ಧಿ ಯೋಜನೆಯಲ್ಲಿ ಹೆಣ್ಣು ಮಕ್ಕಳಿಗೆ ಖಾತೆ ತೆರೆಯಲು ವಯೋಮಿತಿ ಏನು?",
+      "expected_schemes": ["central_sukanya_samriddhi"],
+      "query_type": "explicit_scheme"
+    },
+    {
+      "id": "kn_sukanya_02",
+      "language": "kn",
+      "query": "ಹೆಣ್ಣು ಮಕ್ಕಳ ಭವಿಷ್ಯಕ್ಕಾಗಿ ಉಳಿತಾಯ ಯೋಜನೆ ಯಾವುದು?",
+      "expected_schemes": ["central_sukanya_samriddhi"],
+      "query_type": "generic_intent"
+    },
+    {
+      "id": "kn_outofscope_01",
+      "language": "kn",
+      "query": "ಚಾಲನಾ ಪರವಾನಗಿ ಪಡೆಯುವುದು ಹೇಗೆ?",
+      "expected_schemes": [],
+      "query_type": "out_of_scope"
+    }
+  ]
+}

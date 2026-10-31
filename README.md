@@ -114,6 +114,75 @@ The API will be available at:
 
 ---
 
+## Document Ingestion (Phase 1)
+
+Official PDF documents stored in `data/raw/` are parsed, cleaned, chunked, and written to `data/processed/` as structured JSON artifacts. The original source PDFs are preserved strictly read-only.
+
+### CLI Usage
+
+Ingest a scheme document with explicit metadata (example using synthetic test data only; this is not an official source document):
+
+> `tests/fixtures/synthetic_sample_pm_kisan.pdf` is synthetic test data, not an official Government of India document. Do not use it as a source for real scheme guidance.
+
+```bash
+python -m src.ingestion.cli \
+  --pdf-path tests/fixtures/synthetic_sample_pm_kisan.pdf \
+  --scheme-id pm-kisan-sample \
+  --official-url "https://pmkisan.gov.in" \
+  --document-version "2024-v1" \
+  --chunk-size 500 \
+  --chunk-overlap 100 \
+  --output-dir data/processed
+```
+
+The CLI does not overwrite an existing `<scheme-id>.json` by default. Pass `--overwrite` to replace it intentionally.
+
+> For production ingestion, place verified official government PDFs in `data/raw/` and point `--pdf-path` to the target file.
+
+### Python API Usage
+
+```python
+from pathlib import Path
+from src.ingestion import (
+    run_ingestion_pipeline,
+    DocumentMetadata,
+    ChunkingConfig,
+)
+
+metadata = DocumentMetadata(
+    scheme_id="pm-kisan-sample",
+    source_document="synthetic_sample_pm_kisan.pdf",
+    official_source_url="https://pmkisan.gov.in",
+    document_version="2024-v1",
+)
+
+config = ChunkingConfig(chunk_size=500, chunk_overlap=100)
+
+doc = run_ingestion_pipeline(
+    pdf_path=Path("tests/fixtures/synthetic_sample_pm_kisan.pdf"),
+    metadata=metadata,
+    chunk_config=config,
+    output_dir=Path("data/processed"),
+)
+
+print(f"Ingested {doc.total_chunks} chunks across {doc.total_pages} pages.")
+```
+
+### Processed Output Structure
+
+The output is saved as `data/processed/<scheme_id>.json`. Each chunk preserves full provenance:
+
+- `scheme_id`: Identifier of the scheme.
+- `source_document`: File name of the source PDF.
+- `official_source_url`: Government portal URL.
+- `page_number`: 1-indexed source page.
+- `chunk_index`: 0-indexed sequential position across the entire document.
+- `text`: Cleaned and normalized text content.
+- `extraction_timestamp`: ISO 8601 UTC timestamp.
+- `document_version`: Version string if provided.
+
+---
+
 ## Running Tests
 
 ```bash
@@ -157,7 +226,7 @@ All eligibility determinations are made exclusively by the deterministic Python 
 | Phase | Description | Status |
 |---|---|---|
 | 0 | Project initialization & setup | ✅ Complete |
-| 1 | PDF ingestion pipeline | Planned |
+| 1 | PDF ingestion pipeline | ✅ Complete |
 | 2 | Semantic retrieval (ChromaDB) | Planned |
 | 3 | Deterministic rules engine | Planned |
 | 4 | Agent layer & API | Planned |
