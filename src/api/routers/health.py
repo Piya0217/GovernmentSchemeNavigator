@@ -6,10 +6,17 @@ dependencies so it is always fast to respond.
 
 from __future__ import annotations
 
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 
+from src.api.dependencies import get_api_services
+from src.api.schemas.health import ApiHealthResponse
+from src.api.services import ApiServices
+
 router = APIRouter(tags=["health"])
+api_router = APIRouter(prefix="/api", tags=["health"])
 
 
 class HealthResponse(BaseModel):
@@ -36,4 +43,32 @@ def get_health() -> HealthResponse:
         status="ok",
         version="0.1.0",
         service="government-scheme-navigator",
+    )
+
+
+@api_router.get(
+    "/health",
+    response_model=ApiHealthResponse,
+    summary="API and component health",
+)
+def get_api_health(
+    request: Request,
+    services: Annotated[ApiServices, Depends(get_api_services)],
+) -> ApiHealthResponse:
+    """Report component readiness without loading the embedding model."""
+    registry_status = (
+        "ready" if services.scheme_registry.is_available() else "unavailable"
+    )
+    statuses = [
+        services.retrieval_status,
+        services.eligibility_status,
+        registry_status,
+    ]
+    return ApiHealthResponse(
+        status="ok" if all(status == "ready" for status in statuses) else "degraded",
+        version=request.app.version,
+        service="government-scheme-navigator",
+        retrieval=services.retrieval_status,
+        eligibility=services.eligibility_status,
+        scheme_registry=registry_status,
     )

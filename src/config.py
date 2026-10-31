@@ -5,15 +5,19 @@ Uses pydantic-settings so every value is validated at startup.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 class Settings(BaseSettings):
     """Central configuration for the Government Scheme Navigator API."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=PROJECT_ROOT / ".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
@@ -26,6 +30,10 @@ class Settings(BaseSettings):
     # API
     api_host: str = Field(default="127.0.0.1", description="Bind host.")
     api_port: int = Field(default=8000, description="Bind port.")
+    cors_origins: list[str] = Field(
+        default_factory=list,
+        description="Explicit browser origins allowed to call the API.",
+    )
 
     # ChromaDB
     chroma_persist_dir: str = Field(

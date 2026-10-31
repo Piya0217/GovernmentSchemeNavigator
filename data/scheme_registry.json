@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Authoritative registry of Indian government welfare scheme documents for Government Scheme Navigator.",
   "last_updated": "2026-10-30",
   "schemes": [
@@ -23,7 +23,32 @@
         "has_digital_text": true
       },
       "warnings": [],
-      "notes": "Fully verified digital PDF. Contains complete operational guidelines, eligibility criteria (small/marginal farmer families), exclusion categories (institutional landholders, constitutional posts, retired pensioners >10k, taxpayers), and fund transfer modalities."
+      "notes": "Fully verified digital PDF. Contains complete operational guidelines, eligibility criteria (small/marginal farmer families), exclusion categories (institutional landholders, constitutional posts, retired pensioners >10k, taxpayers), and fund transfer modalities.",
+      "source_documents": [
+        {
+          "document_id": "central_pm_kisan_guidelines_2020",
+          "scheme_id": "central_pm_kisan",
+          "title": "PRADHAN MANTRI KISAN SAMMAN NIDHI SCHEME (PM-KISAN SCHEME) OPERATIONAL GUIDELINES (REVISED AS ON 29.03.2020)",
+          "issuing_authority": "Department of Agriculture, Cooperation & Farmers Welfare, Ministry of Agriculture & Farmers Welfare, Government of India",
+          "official_source_url": "https://pmkisan.gov.in/Documents/RevisedPM-KISANOperationalGuidelines(English).pdf",
+          "local_path": "data/raw/central_pm_kisan_guidelines_2020.pdf",
+          "local_pdf_sha256": "ae82cac83f61a5fa5049387a7c13e00c6d55cef0e9163deb5497dc86c86d697f",
+          "publication_date": null,
+          "effective_date": null,
+          "document_version": "2020-03-29",
+          "document_version_basis": "The local PDF cover identifies the operational guidelines as revised as on 29.03.2020.",
+          "source_identity_status": "unassessed",
+          "byte_match_status": "unassessed",
+          "content_review_status": "unreviewed",
+          "currentness_status": "unknown",
+          "check_observation": {
+            "last_checked_at": null,
+            "checked_by": null,
+            "check_notes": null
+          },
+          "relationships": []
+        }
+      ]
     },
     {
       "scheme_id": "central_pmjay",
@@ -44,7 +69,32 @@
         "has_digital_text": true
       },
       "warnings": [],
-      "notes": "Official beneficiary identification guidelines published by the National Health Authority. Detailed rules for SECC 2011 deprivation criteria, rural (D1-D7) and urban (occupational categories 1-11) eligibility, golden card issuance, and verification workflows."
+      "notes": "Official beneficiary identification guidelines published by the National Health Authority. Detailed rules for SECC 2011 deprivation criteria, rural (D1-D7) and urban (occupational categories 1-11) eligibility, golden card issuance, and verification workflows.",
+      "source_documents": [
+        {
+          "document_id": "central_pmjay_beneficiary_guidelines",
+          "scheme_id": "central_pmjay",
+          "title": "Beneficiary Identification Guidelines - AYUSHMAN BHARAT – PRADHAN MANTRI JAN AROGYA YOJANA (AB PM-JAY)",
+          "issuing_authority": "National Health Authority (NHA), Ministry of Health and Family Welfare, Government of India",
+          "official_source_url": "https://hem.nha.gov.in/BeneficiaryIdentification.pdf",
+          "local_path": "data/raw/central_pmjay_beneficiary_guidelines.pdf",
+          "local_pdf_sha256": "5ce0137307176a67e883d063bfe14ab62cd18f081c1aec6ddbb2b323dedd9b62",
+          "publication_date": null,
+          "effective_date": null,
+          "document_version": null,
+          "document_version_basis": null,
+          "source_identity_status": "unassessed",
+          "byte_match_status": "unassessed",
+          "content_review_status": "unreviewed",
+          "currentness_status": "unknown",
+          "check_observation": {
+            "last_checked_at": null,
+            "checked_by": null,
+            "check_notes": null
+          },
+          "relationships": []
+        }
+      ]
     },
     {
       "scheme_id": "central_pm_vishwakarma",
@@ -65,7 +115,32 @@
         "has_digital_text": true
       },
       "warnings": [],
-      "notes": "Comprehensive official scheme guidelines covering all 18 traditional trade families (carpenters, blacksmiths, goldsmiths, potters, etc.), three-stage verification process (Gram Panchayat/ULB, District, Screening Committee), skill upgrading, toolkit incentive (Rs. 15,000), collateral-free enterprise credit (Tranche 1 Rs. 1 lakh @ 5%, Tranche 2 Rs. 2 lakh), and digital incentive."
+      "notes": "Comprehensive official scheme guidelines covering all 18 traditional trade families (carpenters, blacksmiths, goldsmiths, potters, etc.), three-stage verification process (Gram Panchayat/ULB, District, Screening Committee), skill upgrading, toolkit incentive (Rs. 15,000), collateral-free enterprise credit (Tranche 1 Rs. 1 lakh @ 5%, Tranche 2 Rs. 2 lakh), and digital incentive.",
+      "source_documents": [
+        {
+          "document_id": "central_pm_vishwakarma_guidelines",
+          "scheme_id": "central_pm_vishwakarma",
+          "title": "Scheme Guidelines for PM Vishwakarma",
+          "issuing_authority": "Ministry of Micro, Small and Medium Enterprises (MSME), Government of India",
+          "official_source_url": "https://pmvishwakarma.gov.in/cdn/MiscFiles/eng_v30.0_PM_Vishwakarma_Guidelines_final.pdf",
+          "local_path": "data/raw/central_pm_vishwakarma_guidelines_2023.pdf",
+          "local_pdf_sha256": "bea3f55ade5f124ec2eb3be6ec710539aa76b8355d61e8d5e3a773273cd46ebe",
+          "publication_date": null,
+          "effective_date": null,
+          "document_version": null,
+          "document_version_basis": null,
+          "source_identity_status": "unassessed",
+          "byte_match_status": "unassessed",
+          "content_review_status": "unreviewed",
+          "currentness_status": "unknown",
+          "check_observation": {
+            "last_checked_at": null,
+            "checked_by": null,
+            "check_notes": null
+          },
+          "relationships": []
+        }
+      ]
     },
     {
       "scheme_id": "central_sukanya_samriddhi",
